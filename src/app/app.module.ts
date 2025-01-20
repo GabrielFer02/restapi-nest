@@ -5,7 +5,19 @@ import { MessageModule } from 'src/messages/message.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [TypeOrmModule.forRoot(), MessageModule],
+  imports: [
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      database: 'postgres',
+      password: '5aaef876ce0a4f3caf9ea08d0859bd6c',
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
+    MessageModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
   exports: [],
