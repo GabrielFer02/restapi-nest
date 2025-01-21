@@ -39,9 +39,10 @@ export class MessageService {
       ...body,
     };
 
-    const message = await this.messageRepository.create(newMessage);
+    const message = this.messageRepository.create(newMessage);
+    await this.messageRepository.save(message);
 
-    return this.messageRepository.save(message);
+    return message;
   }
 
   async update(id: number, body: UpdateMessageDto) {
