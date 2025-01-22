@@ -17,11 +17,11 @@ export class Message {
   @Column({ type: 'varchar', length: 255 })
   text: string;
 
-  @ManyToOne(() => Person)
+  @ManyToOne(() => Person, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'from' })
   from: Person;
 
-  @ManyToOne(() => Person)
+  @ManyToOne(() => Person, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'to' })
   to: Person;
 
