@@ -30,8 +30,6 @@ export class PersonService {
 
       const newPerson = this.personRepository.create(personData);
       return this.personRepository.save(newPerson);
-
-      // return newPerson;
     } catch (error) {
       if (error.code === '23505')
         throw new ConflictException('E-mail já cadastrado');
