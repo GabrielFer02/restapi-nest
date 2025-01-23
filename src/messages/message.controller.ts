@@ -4,15 +4,16 @@ import {
   Delete,
   Get,
   Param,
-  ParseIntPipe,
   Patch,
   Post,
   Query,
+  UseInterceptors,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { PaginationDto } from 'src/app/common/dto/pagination.dto';
+import { AddHeaderInterceptor } from 'src/app/common/interceptors/add-header.interceptor';
 
 @Controller('message')
 export class MessageController {
@@ -23,8 +24,9 @@ export class MessageController {
     return this.messageService.findAll(paginationDto);
   }
 
-  @Get('/:id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  @Get(':id')
+  @UseInterceptors(AddHeaderInterceptor)
+  findOne(@Param('id') id: number) {
     return this.messageService.findOne(id);
   }
 
@@ -33,16 +35,13 @@ export class MessageController {
     return this.messageService.create(body);
   }
 
-  @Patch('/:id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() body: UpdateMessageDto,
-  ) {
+  @Patch(':id')
+  update(@Param('id') id: number, @Body() body: UpdateMessageDto) {
     return this.messageService.update(id, body);
   }
 
-  @Delete('/:id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  @Delete(':id')
+  remove(@Param('id') id: number) {
     return this.messageService.remove(id);
   }
 }
