@@ -7,13 +7,11 @@ import {
   Patch,
   Post,
   Query,
-  UseInterceptors,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { PaginationDto } from 'src/app/common/dto/pagination.dto';
-import { AddHeaderInterceptor } from 'src/app/common/interceptors/add-header.interceptor';
 
 @Controller('message')
 export class MessageController {
@@ -25,7 +23,6 @@ export class MessageController {
   }
 
   @Get(':id')
-  @UseInterceptors(AddHeaderInterceptor)
   findOne(@Param('id') id: number) {
     return this.messageService.findOne(id);
   }
