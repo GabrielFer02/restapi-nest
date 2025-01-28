@@ -4,6 +4,7 @@ import {
   ExecutionContext,
   Injectable,
   NestInterceptor,
+  NotFoundException,
 } from '@nestjs/common';
 import { catchError, Observable, throwError } from 'rxjs';
 
@@ -17,7 +18,7 @@ export class ErrorHandlingInterceptor implements NestInterceptor {
       catchError(error => {
         return throwError(() => {
           if (error.name === 'NotFoundException')
-            return new BadRequestException(error.message);
+            return new NotFoundException(error.message);
 
           return new BadRequestException('Ocorreu um erro desconhecido');
         });

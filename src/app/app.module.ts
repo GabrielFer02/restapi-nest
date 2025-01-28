@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { MessageModule } from 'src/messages/message.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PersonModule } from 'src/person/person.module';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { MyExceptionFilter } from './common/filters/my-exception.filter';
 import { ErrorExceptionFilter } from './common/filters/error-exception.filter';
+import { IsAdminGuard } from './common/guards/is-admin.guard';
 
 @Module({
   imports: [
@@ -33,6 +34,10 @@ import { ErrorExceptionFilter } from './common/filters/error-exception.filter';
     {
       provide: APP_FILTER,
       useClass: MyExceptionFilter,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: IsAdminGuard,
     },
   ],
   exports: [],
