@@ -4,6 +4,9 @@ import { AppService } from './app.service';
 import { MessageModule } from 'src/messages/message.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PersonModule } from 'src/person/person.module';
+import { APP_FILTER } from '@nestjs/core';
+import { MyExceptionFilter } from './common/filters/my-exception.filter';
+import { ErrorExceptionFilter } from './common/filters/error-exception.filter';
 
 @Module({
   imports: [
@@ -21,7 +24,13 @@ import { PersonModule } from 'src/person/person.module';
     PersonModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: ErrorExceptionFilter,
+    },
+  ],
   exports: [],
 })
 export class AppModule {}
