@@ -30,6 +30,10 @@ import { ErrorExceptionFilter } from './common/filters/error-exception.filter';
       provide: APP_FILTER,
       useClass: ErrorExceptionFilter,
     },
+    {
+      provide: APP_FILTER,
+      useClass: MyExceptionFilter,
+    },
   ],
   exports: [],
 })
