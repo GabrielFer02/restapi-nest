@@ -1,3 +1,21 @@
 {
   "git.enabled": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "tsconfig.json": true,
+    "tsconfig.build.json": true,
+    "nest-cli.json": true,
+    ".prettierrc": true,
+    ".eslintrc.js": true,
+    "README.md": true,
+    "package-lock.json": true,
+    "package.json": true,
+    ".gitignore": true,
+    "node_modules": true
+  }
 }
