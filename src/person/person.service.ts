@@ -8,28 +8,35 @@ import { UpdatePersonDto } from './dto/update-person.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from './entities/person.entity';
 import { Repository } from 'typeorm';
+import { HashingServiceProtocol } from 'src/auth/hashing/hashing.service';
 
 @Injectable()
 export class PersonService {
   constructor(
     @InjectRepository(Person)
     private readonly personRepository: Repository<Person>,
+    private readonly hashingServiceProtocol: HashingServiceProtocol,
   ) {}
 
   notFoundException() {
     throw new NotFoundException('Pessoa não eoncontrada');
   }
 
-  create(createPersonDto: CreatePersonDto) {
+  async create(createPersonDto: CreatePersonDto) {
     try {
+      const passwordHash = await this.hashingServiceProtocol.hash(
+        createPersonDto.password,
+      );
+
       const personData = {
         email: createPersonDto.email,
         name: createPersonDto.name,
-        passwordHash: createPersonDto.password,
+        passwordHash,
       };
 
       const newPerson = this.personRepository.create(personData);
-      return this.personRepository.save(newPerson);
+      await this.personRepository.save(newPerson);
+      return newPerson;
     } catch (error) {
       if (error.code === '23505')
         throw new ConflictException('E-mail já cadastrado');
@@ -55,10 +62,19 @@ export class PersonService {
   async update(id: number, updatePersonDto: UpdatePersonDto) {
     const personData = {
       name: updatePersonDto.name,
-      passwordHash: updatePersonDto.password,
     };
 
-    const person = await this.personRepository.preload({ id, ...personData });
+    if (updatePersonDto.password) {
+      const passwordHash = await this.hashingServiceProtocol.hash(
+        updatePersonDto.password,
+      );
+      personData['passwordHash'] = passwordHash;
+    }
+
+    const person = await this.personRepository.preload({
+      id,
+      ...personData,
+    });
 
     if (!person) this.notFoundException();
 
