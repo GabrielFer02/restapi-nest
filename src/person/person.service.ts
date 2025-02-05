@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -83,6 +84,9 @@ export class PersonService {
 
     if (!person) this.notFoundException();
 
+    if (person.id !== tokenPayload.sub)
+      throw new ForbiddenException('Unauthorized person');
+
     return this.personRepository.save(person);
   }
 
@@ -90,6 +94,9 @@ export class PersonService {
     const person = await this.personRepository.findOneBy({ id });
 
     if (!person) this.notFoundException();
+
+    if (person.id !== tokenPayload.sub)
+      throw new ForbiddenException('Unauthorized person');
 
     return this.personRepository.remove(person);
   }
