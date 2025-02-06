@@ -49,7 +49,6 @@ export class PersonService {
 
   async findAll() {
     const person = await this.personRepository.find({ order: { id: 'desc' } });
-
     return person;
   }
 

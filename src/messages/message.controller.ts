@@ -7,11 +7,15 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { MessageService } from './message.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { PaginationDto } from 'src/app/common/dto/pagination.dto';
+import { AuthTokenGuadr } from 'src/auth/guards/auth-token.guard';
+import { TokenPayloadParam } from 'src/auth/params/token-payload.param';
+import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
 
 @Controller('message')
 export class MessageController {
@@ -27,18 +31,31 @@ export class MessageController {
     return this.messageService.findOne(id);
   }
 
+  @UseGuards(AuthTokenGuadr)
   @Post()
-  createPost(@Body() body: CreateMessageDto) {
-    return this.messageService.create(body);
+  createPost(
+    @Body() body: CreateMessageDto,
+    @TokenPayloadParam() tokenPayload: TokenPayloadDto,
+  ) {
+    return this.messageService.create(body, tokenPayload);
   }
 
+  @UseGuards(AuthTokenGuadr)
   @Patch(':id')
-  update(@Param('id') id: number, @Body() body: UpdateMessageDto) {
-    return this.messageService.update(id, body);
+  update(
+    @Param('id') id: number,
+    @Body() body: UpdateMessageDto,
+    @TokenPayloadParam() tokenPayload: TokenPayloadDto,
+  ) {
+    return this.messageService.update(id, body, tokenPayload);
   }
 
+  @UseGuards(AuthTokenGuadr)
   @Delete(':id')
-  remove(@Param('id') id: number) {
-    return this.messageService.remove(id);
+  remove(
+    @Param('id') id: number,
+    @TokenPayloadParam() tokenPayload: TokenPayloadDto,
+  ) {
+    return this.messageService.remove(id, tokenPayload);
   }
 }

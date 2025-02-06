@@ -13,8 +13,6 @@ import { PersonService } from './person.service';
 import { CreatePersonDto } from './dto/create-person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import { AuthTokenGuadr } from 'src/auth/guards/auth-token.guard';
-import { Request } from 'express';
-import { REQUEST_TOKEN_PAYLOAD_KEY } from 'src/auth/hashing/auth.constants';
 import { TokenPayloadParam } from 'src/auth/params/token-payload.param';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
 
@@ -29,8 +27,7 @@ export class PersonController {
 
   @UseGuards(AuthTokenGuadr)
   @Get()
-  findAll(@Req() req: Request) {
-    console.log(req[REQUEST_TOKEN_PAYLOAD_KEY]);
+  findAll() {
     return this.personService.findAll();
   }
 
