@@ -38,4 +38,7 @@ export class Person {
 
   @Column({ default: true })
   active: boolean;
+
+  // @Column({ type: 'simple-array', default: [] })
+  // routePolicies: RoutePolicies[];
 }

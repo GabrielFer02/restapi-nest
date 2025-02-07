@@ -42,6 +42,8 @@ export class AuthTokenGuadr implements CanActivate {
 
       if (!person) throw new Error('Person Unauthorized');
 
+      payload['person'] = person;
+
       request[REQUEST_TOKEN_PAYLOAD_KEY] = payload;
     } catch (error: unknown) {
       if (typeof error === 'string') throw new UnauthorizedException(error);

@@ -1,6 +1,11 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROUTE_POLICE_KEY } from '../auth.constants';
+import { REQUEST_TOKEN_PAYLOAD_KEY, ROUTE_POLICE_KEY } from '../auth.constants';
 import { RoutePolicies } from '../enum/route-polices.enum';
 
 @Injectable()
@@ -12,7 +17,25 @@ export class RoutePoliceGuard implements CanActivate {
       ROUTE_POLICE_KEY,
       context.getHandler(),
     );
-    console.log(routePolicyRequired);
+
+    if (!routePolicyRequired) return true;
+
+    const tokenPayload = context.switchToHttp().getRequest()[
+      REQUEST_TOKEN_PAYLOAD_KEY
+    ];
+
+    if (!tokenPayload)
+      throw new UnauthorizedException(
+        `Permission required ${routePolicyRequired}. User user not logged in`,
+      );
+
+    // const { person }: { person: Person } = tokenPayload;
+
+    // if (!person.routePolicies.includes(routePolicyRequired))
+    //   throw new UnauthorizedException(
+    //     `Permission required ${routePolicyRequired}`,
+    //   );
+
     return true;
   }
 }

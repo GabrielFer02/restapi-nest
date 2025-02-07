@@ -16,17 +16,12 @@ import { PaginationDto } from 'src/app/common/dto/pagination.dto';
 import { AuthTokenGuadr } from 'src/auth/guards/auth-token.guard';
 import { TokenPayloadParam } from 'src/auth/params/token-payload.param';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
-import { RoutePoliceGuard } from 'src/auth/guards/route-police.guard';
-import { SetRoutePolicy } from 'src/auth/decorators/set-route-police.decorator';
-import { RoutePolicies } from 'src/auth/enum/route-polices.enum';
 
-@UseGuards(RoutePoliceGuard)
 @Controller('message')
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
   @Get()
-  @SetRoutePolicy(RoutePolicies.findAllMessages)
   findAll(@Query() paginationDto: PaginationDto) {
     return this.messageService.findAll(paginationDto);
   }
