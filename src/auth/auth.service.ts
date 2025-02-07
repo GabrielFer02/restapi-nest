@@ -35,33 +35,22 @@ export class AuthService {
     );
   }
 
-  async login(loginDto: LoginDto) {
-    let passwordIsValid = false;
-
-    const person = await this.personRepository.findOneBy({
-      email: loginDto.email,
-    });
-
-    if (person) {
-      passwordIsValid = await this.hashingServiceProtocol.compare(
-        loginDto.password,
-        person.passwordHash,
-      );
-    }
-
-    if (!passwordIsValid)
-      throw new UnauthorizedException('Usuário ou senha incorretas');
-
-    const accessToken = await this.signJwtAsync<Partial<Person>>(
+  private async createTokens(person: Person) {
+    const accessTokenPromise = this.signJwtAsync<Partial<Person>>(
       person.id,
       this.jwtConfiguration.jwtTtl,
       { name: person.name },
     );
 
-    const refreshToken = await this.signJwtAsync(
+    const refreshTokenPromise = this.signJwtAsync(
       person.id,
       this.jwtConfiguration.jwtRefreshTtl,
     );
+
+    const [accessToken, refreshToken] = await Promise.all([
+      accessTokenPromise,
+      refreshTokenPromise,
+    ]);
 
     return {
       refreshToken,
@@ -69,5 +58,49 @@ export class AuthService {
     };
   }
 
-  refreshTokens(refreshTokenDto: RefreshTokenDto) {}
+  async login(loginDto: LoginDto) {
+    let passwordIsValid = false;
+
+    const person = await this.personRepository.findOneBy({
+      email: loginDto.email,
+      active: true,
+    });
+
+    if (person) {
+      passwordIsValid = await this.hashingServiceProtocol.compare(
+        loginDto.password,
+        person.passwordHash,
+      );
+    } else {
+      throw new UnauthorizedException('Person Unauthorized');
+    }
+
+    if (!passwordIsValid)
+      throw new UnauthorizedException('Usuário ou senha incorretas');
+
+    return this.createTokens(person);
+  }
+
+  async refreshTokens(refreshTokenDto: RefreshTokenDto) {
+    try {
+      const { sub } = await this.jwtService.verifyAsync(
+        refreshTokenDto.refreshToken,
+        this.jwtConfiguration,
+      );
+
+      const person = await this.personRepository.findOneBy({
+        id: sub,
+        active: true,
+      });
+
+      if (!person) throw new Error('Person Unauthorized');
+
+      return this.createTokens(person);
+    } catch (error) {
+      if (error instanceof Error)
+        throw new UnauthorizedException(error.message);
+
+      if (typeof error === 'string') throw new UnauthorizedException(error);
+    }
+  }
 }
