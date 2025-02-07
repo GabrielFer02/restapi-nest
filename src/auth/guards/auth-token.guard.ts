@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 import jwtConfig from '../config/jwt.config';
 import { ConfigType } from '@nestjs/config';
-import { REQUEST_TOKEN_PAYLOAD_KEY } from '../hashing/auth.constants';
+import { REQUEST_TOKEN_PAYLOAD_KEY } from '../auth.constants';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Person } from 'src/person/entities/person.entity';
 import { Repository } from 'typeorm';
