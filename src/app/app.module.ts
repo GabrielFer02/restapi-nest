@@ -8,6 +8,8 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import globalConfig from 'src/global-config/global.config';
 import { GlobalConfigModule } from 'src/global-config/global-config.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import * as path from 'node:path';
 
 @Module({
   imports: [
@@ -32,6 +34,10 @@ import { AuthModule } from 'src/auth/auth.module';
     MessageModule,
     PersonModule,
     AuthModule,
+    ServeStaticModule.forRoot({
+      serveRoot: path.resolve(__dirname, '..', '..', 'pictures'),
+      rootPath: '/pictures',
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],
