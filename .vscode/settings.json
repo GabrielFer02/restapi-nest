@@ -14,7 +14,7 @@
     ".eslintrc.js": true,
     "README.md": true,
     "package-lock.json": true,
-    "package.json": true,
+    // "package.json": true,
     ".gitignore": true,
     "node_modules": true
   }
