@@ -5,6 +5,7 @@ import { HashingServiceProtocol } from 'src/auth/hashing/hashing.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { CreatePersonDto } from './dto/create-person.dto';
+import { ConflictException } from '@nestjs/common';
 
 describe('PersonService', () => {
   let personService: PersonService;
@@ -51,9 +52,19 @@ describe('PersonService', () => {
       };
       const passwordHash = 'HASHDESENHA';
 
-      jest.spyOn(hashingService, 'hash').mockResolvedValue(passwordHash);
+      const newPerson = {
+        id: 1,
+        name: createPersonDto.name,
+        email: createPersonDto.email,
+        passwordHash,
+      };
 
-      await personService.create(createPersonDto);
+      jest.spyOn(hashingService, 'hash').mockResolvedValue(passwordHash);
+      jest
+        .spyOn(personRepository, 'create')
+        .mockReturnValue(newPerson as Person);
+
+      const result = await personService.create(createPersonDto);
 
       expect(hashingService.hash).toHaveBeenCalledWith(
         createPersonDto.password,
@@ -64,6 +75,27 @@ describe('PersonService', () => {
         passwordHash,
         name: createPersonDto.name,
       });
+
+      expect(personRepository.save).toHaveBeenCalledWith(newPerson);
+      expect(result).toEqual(newPerson);
+    });
+
+    it('deve lançar uma ConflictException quando e-mail já existe', async () => {
+      jest.spyOn(personRepository, 'save').mockRejectedValue({ code: '23505' });
+
+      await expect(personService.create({} as any)).rejects.toThrow(
+        ConflictException,
+      );
+    });
+
+    it('deve lançar uma ConflictException quando e-mail já existe', async () => {
+      jest
+        .spyOn(personRepository, 'save')
+        .mockRejectedValue(new Error('Erro genérico'));
+
+      await expect(personService.create({} as any)).rejects.toThrow(
+        new Error('Erro genérico'),
+      );
     });
   });
 });
