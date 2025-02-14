@@ -8,18 +8,18 @@ import {
 
 export class CreatePersonDto {
   @IsEmail()
-  readonly email: string;
+  email: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(6)
-  readonly password: string;
+  password: string;
 
   @IsString()
   @IsNotEmpty()
   @MinLength(3)
   @MaxLength(50)
-  readonly name: string;
+  name: string;
 
   // @IsEnum(RoutePolicies, { each: true })
   // routePolicies: RoutePolicies[];
