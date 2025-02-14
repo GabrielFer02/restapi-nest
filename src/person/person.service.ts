@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   ForbiddenException,
   Injectable,
@@ -11,6 +12,8 @@ import { Person } from './entities/person.entity';
 import { Repository } from 'typeorm';
 import { HashingServiceProtocol } from 'src/auth/hashing/hashing.service';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
+import * as path from 'node:path';
+import * as fs from 'fs/promises';
 
 @Injectable()
 export class PersonService {
@@ -21,7 +24,7 @@ export class PersonService {
   ) {}
 
   notFoundException() {
-    throw new NotFoundException('Pessoa não eoncontrada');
+    throw new NotFoundException('Person not Found');
   }
 
   async create(createPersonDto: CreatePersonDto) {
@@ -98,5 +101,33 @@ export class PersonService {
       throw new ForbiddenException('Unauthorized person');
 
     return this.personRepository.remove(person);
+  }
+
+  async uploadPicture(
+    file: Express.Multer.File,
+    tokenPayload: TokenPayloadDto,
+  ) {
+    if (file.size < 1024) throw new BadRequestException('File too small');
+
+    const person = await this.personRepository.findOneBy({
+      id: tokenPayload.sub,
+    });
+
+    if (!person) this.notFoundException();
+
+    const fileExtension = path
+      .extname(file.originalname)
+      .toLowerCase()
+      .slice(1);
+
+    const fileName = `${tokenPayload.sub}.${fileExtension}`;
+    const fileFullPath = path.resolve(process.cwd(), 'pictures', fileName);
+
+    await fs.writeFile(fileFullPath, file.buffer);
+
+    person.picture = fileName;
+    await this.personRepository.save(person);
+
+    return person;
   }
 }
