@@ -25,10 +25,10 @@ export class Person {
   name: string;
 
   @CreateDateColumn()
-  ceatedAt?: Date;
+  createdAt?: Date;
 
   @UpdateDateColumn()
-  updateAt?: Date;
+  updatedAt?: Date;
 
   @OneToMany(() => Message, message => message.from)
   sentMessages: Message[];
