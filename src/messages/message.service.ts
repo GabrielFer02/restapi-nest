@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { PersonService } from 'src/person/person.service';
 import { PaginationDto } from 'src/app/common/dto/pagination.dto';
 import { TokenPayloadDto } from 'src/auth/dto/token-payload.dto';
+import { EmailService } from 'src/email/email.service';
 
 @Injectable()
 export class MessageService {
@@ -18,6 +19,7 @@ export class MessageService {
     @InjectRepository(Message)
     private readonly messageRepository: Repository<Message>,
     private readonly personService: PersonService,
+    private readonly emailService: EmailService,
   ) {}
 
   throwNotFoundError() {
@@ -72,6 +74,12 @@ export class MessageService {
 
     const message = this.messageRepository.create(newMessage);
     await this.messageRepository.save(message);
+
+    await this.emailService.sendEmail(
+      to.email,
+      `Você recebeu um recado de ${from.name} `,
+      createMessageDto.text,
+    );
 
     return {
       ...message,

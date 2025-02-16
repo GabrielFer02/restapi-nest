@@ -4,9 +4,10 @@ import { MessageService } from './message.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Message } from './entities/message.entity';
 import { PersonModule } from 'src/person/person.module';
+import { EmailModule } from 'src/email/email.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Message]), PersonModule],
+  imports: [TypeOrmModule.forFeature([Message]), PersonModule, EmailModule],
   controllers: [MessageController],
   providers: [MessageService],
   exports: [],
